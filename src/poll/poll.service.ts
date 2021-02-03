@@ -37,4 +37,16 @@ export class PollService {
 
     return poll;
   }
+
+  public async getPolls(cursor?: number): Promise<Poll[]> {
+    // Filter-out scheduled poll.
+    const builder = this.pollRepo
+      .createQueryBuilder('poll')
+      .innerJoinAndSelect('poll.options', 'pollOption')
+      .where('CURRENT_DATE >= poll.startAt');
+    if (cursor !== undefined) {
+      builder.andWhere('poll.createdAt < :cursor', { cursor: dayjs.unix(cursor).toDate() });
+    }
+    return builder.orderBy('poll.isActive', 'DESC').addOrderBy('poll.count', 'DESC').getMany();
+  }
 }

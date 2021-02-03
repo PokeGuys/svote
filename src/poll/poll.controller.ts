@@ -1,6 +1,15 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOperation, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnprocessableEntityResponse,
+} from '@nestjs/swagger';
+import dayjs from 'dayjs';
 import { CreatePollDto } from './dto/create-poll.dto';
+import { PollsQueryDto } from './dto/polls-query.dto';
+import { PollListResponseDto } from './dto/response/poll-list-response.dto';
 import { PollFormatter } from './formatter/poll.formatter';
 import { PollService } from './poll.service';
 
@@ -21,5 +30,21 @@ export class PollController {
     const { hkid, title, options, startAt, endAt } = createPollDto;
     const poll = await this.pollService.createPoll(hkid, title, options, startAt, endAt);
     return this.pollFormatter.toJson(poll);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get active poll list' })
+  @ApiOkResponse({
+    description: 'Return all active polls.',
+    type: () => PollListResponseDto,
+  })
+  public async getPolls(@Query() query: PollsQueryDto) {
+    const polls = await this.pollService.getPolls(query.cursor);
+    const result = polls.map(this.pollFormatter.toJson);
+    const cursor = polls.length > 0 ? dayjs(polls[polls.length - 1].createdAt).unix() : null;
+    return {
+      items: result,
+      cursor,
+    };
   }
 }
