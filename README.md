@@ -41,10 +41,7 @@ yarn
 # 3. Create a ".env" file
 cp .env.example .env
 
-# 4. Create a "ormconfig.json" file
-cp ormconfig.example.json .ormconfig.json
-
-# 5. Open ".env" file and enter the service info.
-# 6. Run Svote via Docker
+# 4. Open ".env" file and enter the service info.
+# 5. Run Svote via Docker
 docker-compose up
 ```
