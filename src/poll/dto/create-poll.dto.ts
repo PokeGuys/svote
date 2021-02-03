@@ -10,9 +10,9 @@ import {
   Min,
   Validate,
 } from 'class-validator';
-import { IsAfterDate } from 'src/app/rule/is-after-date';
-import { IsAfterOrToday } from 'src/app/rule/is-after-or-today';
-import { IsValidHKID } from 'src/app/rule/is-valid-hkid';
+import { IsAfterDate } from '../../app/rule/is-after-date';
+import { IsAfterOrToday } from '../../app/rule/is-after-or-today';
+import { IsValidHKID } from '../../app/rule/is-valid-hkid';
 
 export class CreatePollDto {
   @IsNotEmpty()

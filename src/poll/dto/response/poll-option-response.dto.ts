@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PollOption } from 'src/poll/poll-options.entity';
+import { PollOption } from '../../poll-options.entity';
+
 export class PollOptionResponseDto {
   @ApiProperty()
   optionId: string;

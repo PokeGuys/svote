@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { BaseEntity, BeforeInsert, Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
 @Entity('votes')
