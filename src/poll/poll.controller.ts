@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { PollsQueryDto } from './dto/polls-query.dto';
 import { PollListResponseDto } from './dto/response/poll-list-response.dto';
+import { VoteDto } from './dto/vote.dto';
 import { PollFormatter } from './formatter/poll.formatter';
 import { PollService } from './poll.service';
 
@@ -46,5 +47,17 @@ export class PollController {
       items: result,
       cursor,
     };
+  }
+
+  @Post(':pollOptionId/vote')
+  @ApiOperation({ summary: 'Vote for a poll' })
+  @ApiCreatedResponse({
+    description: 'Vote successfully.',
+  })
+  @ApiUnprocessableEntityResponse({
+    description: 'Validation failed.',
+  })
+  public async voteCampaign(@Param('pollOptionId') pollOptionId: string, @Body() voteDto: VoteDto) {
+    await this.pollService.vote(pollOptionId, voteDto.hkid);
   }
 }
