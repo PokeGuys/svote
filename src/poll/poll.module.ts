@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigFactoryModule } from 'src/config/config-factory.module';
 import { RedisModule } from '../app/redis/redis.module';
+import { ConfigFactoryModule } from '../config/config-factory.module';
 import { RedisConfigService } from '../config/redis-config.service';
 import { PollFormatter } from './formatter/poll.formatter';
 import { PollOption } from './poll-options.entity';
