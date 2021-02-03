@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { useContainer } from 'class-validator';
 import { ApplicationModule } from './app.module';
+import { ValidationPipe } from './app/pipe/validation.pipe';
 import { setupSwagger } from './swagger';
 
 async function bootstrap() {
@@ -13,6 +14,7 @@ async function bootstrap() {
 
   // Enabling DI for class-validator
   useContainer(app.select(ApplicationModule), { fallbackOnErrors: true });
+  app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(3000);
 }
