@@ -6,7 +6,7 @@ import {
   ApiTags,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { PollsQueryDto } from './dto/polls-query.dto';
 import { PollListResponseDto } from './dto/response/poll-list-response.dto';
