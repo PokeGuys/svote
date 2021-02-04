@@ -7,7 +7,6 @@ import {
   ApiTags,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
-import * as dayjs from 'dayjs';
 import { UserId } from '../app/decorator/user-id.decorator';
 import { AuthGuard } from '../app/guards/auth.guard';
 import { CreatePollDto } from './dto/create-poll.dto';
@@ -44,12 +43,11 @@ export class PollController {
     type: () => PollListResponseDto,
   })
   public async getPolls(@Query() query: PollsQueryDto) {
-    const polls = await this.pollService.getPolls(query.cursor);
-    const result = polls.map(this.pollFormatter.toJson);
-    const cursor = polls.length > 0 ? dayjs(polls[polls.length - 1].createdAt).unix() : null;
+    const polls = await this.pollService.getPolls(query.page ?? 1);
+    const items = polls.items.map(this.pollFormatter.toJson);
     return {
-      items: result,
-      cursor,
+      items,
+      meta: polls.meta,
     };
   }
 

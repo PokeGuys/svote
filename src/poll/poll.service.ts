@@ -2,12 +2,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as dayjs from 'dayjs';
 import IORedis from 'ioredis';
+import { paginateRaw, Pagination } from 'nestjs-typeorm-paginate';
 import { Repository } from 'typeorm';
 import { REDIS_CLIENT } from '../app/redis/redis.constant';
 import { PollAlreadyClosedException } from './exception/poll-already-closed.exception';
 import { PollAlreadyVotedException } from './exception/poll-already-voted.exception';
 import { PollNotFoundException } from './exception/poll-not-found.exception';
 import { PollOption } from './poll-options.entity';
+import { POLL_PAGE_LIMIT } from './poll.constant';
 import { Poll } from './poll.entity';
 
 @Injectable()
@@ -28,10 +30,12 @@ export class PollService {
     startAt: number,
     endAt: number,
   ): Promise<Poll> {
+    const startDate = dayjs.unix(startAt).startOf('day');
     const poll = new Poll();
     poll.title = title;
     poll.creatorId = hkid;
-    poll.startAt = dayjs.unix(startAt).toDate();
+    poll.isActive = startDate.isSame(dayjs().startOf('day'));
+    poll.startAt = startDate.toDate();
     poll.endAt = dayjs.unix(endAt).toDate();
     await this.pollRepo.save(poll);
     poll.options = options.map((optionDescription) => {
@@ -45,21 +49,20 @@ export class PollService {
     return poll;
   }
 
-  public async getPolls(cursor?: number): Promise<Poll[]> {
+  public async getPolls(page: number): Promise<Pagination<Poll>> {
     // Filter-out scheduled poll.
     const builder = this.pollRepo
       .createQueryBuilder('poll')
       .innerJoinAndSelect('poll.options', 'pollOption')
-      .where('CURRENT_DATE >= poll.startAt');
-    if (cursor !== undefined) {
-      builder.andWhere('poll.createdAt < :cursor', { cursor: dayjs.unix(cursor).toDate() });
-    }
-    return builder
+      .where('CURRENT_DATE >= poll.startAt')
       .orderBy(
         `poll.isActive DESC, CASE WHEN poll.isActive THEN poll.count END DESC, CASE WHEN NOT poll.isActive THEN poll.endAt END`,
         'DESC',
-      )
-      .getMany();
+      );
+    return paginateRaw(builder, {
+      page,
+      limit: POLL_PAGE_LIMIT,
+    });
   }
 
   public async vote(optionId: string, hkid: string): Promise<void> {
