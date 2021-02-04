@@ -16,6 +16,6 @@ async function bootstrap() {
   useContainer(app.select(ApplicationModule), { fallbackOnErrors: true });
   app.useGlobalPipes(new ValidationPipe());
 
-  await app.listen(3000);
+  await app.listen(3000, '0.0.0.0');
 }
 bootstrap();
