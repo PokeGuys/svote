@@ -11,9 +11,9 @@ export class PollOptionResponseDto {
   @ApiProperty()
   count: number;
 
-  constructor(option: PollOption) {
+  constructor(option: PollOption, displayCount?: boolean) {
     this.optionId = option.optionId;
     this.text = option.text;
-    this.count = option.count;
+    this.count = displayCount ? option.count : 0;
   }
 }

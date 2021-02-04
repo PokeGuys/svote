@@ -35,6 +35,11 @@ export class PollTable1612274291554 implements MigrationInterface {
             default: false,
           },
           {
+            name: 'isEnded',
+            type: 'boolean',
+            default: false,
+          },
+          {
             name: 'startAt',
             type: 'DATE',
           },
@@ -66,6 +71,9 @@ export class PollTable1612274291554 implements MigrationInterface {
       }),
       new TableIndex({
         columnNames: ['isActive'],
+      }),
+      new TableIndex({
+        columnNames: ['isEnded'],
       }),
     ]);
   }
