@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PaginationDto } from '../../../app/pagination.dto';
+import { PaginationMetaDto } from '../../../app/pagination-meta.dto';
 import { PollResponseDto } from './poll-response.dto';
 
 export class PollListResponseDto {
@@ -7,5 +7,5 @@ export class PollListResponseDto {
   items: PollResponseDto[];
 
   @ApiProperty()
-  meta: PaginationDto;
+  meta: PaginationMetaDto;
 }

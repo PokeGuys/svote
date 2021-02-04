@@ -2,8 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import dayjs from 'dayjs';
 import IORedis from 'ioredis';
-import { createPaginationObject, Pagination } from 'nestjs-typeorm-paginate';
 import { In, Repository } from 'typeorm';
+import { PaginationMetaDto } from '../app/pagination-meta.dto';
+import { PaginationDto } from '../app/pagination.dto';
 import { REDIS_CLIENT } from '../app/redis/redis.constant';
 import { PollAlreadyClosedException } from './exception/poll-already-closed.exception';
 import { PollAlreadyVotedException } from './exception/poll-already-voted.exception';
@@ -55,7 +56,7 @@ export class PollService {
     return poll;
   }
 
-  public async getPolls(page: number, userId: string): Promise<Pagination<Poll>> {
+  public async getPolls(page: number, userId: string): Promise<PaginationDto<Poll>> {
     // TODO: Apply caching.
     // Filter-out scheduled poll.
     const limit = POLL_PAGE_LIMIT;
@@ -86,7 +87,7 @@ export class PollService {
       }
       pollKeyById[option.pollId].options.push(option);
     });
-    return createPaginationObject(items, total, page, limit);
+    return this.createPaginationObject(items, total, page, limit);
   }
 
   public async vote(optionId: string, hkid: string): Promise<Vote> {
@@ -105,6 +106,25 @@ export class PollService {
     await this.cache.sadd(cacheKey, hkid);
     await this.pollOptionRepo.increment({ optionId }, 'count', 1);
     return this.storeVoteResult(option.pollId, optionId, hkid);
+  }
+
+  protected createPaginationObject<T>(
+    items: T[],
+    totalItems: number,
+    currentPage: number,
+    limit: number,
+  ): PaginationDto<T> {
+    const totalPages = Math.ceil(totalItems / limit);
+    const meta: PaginationMetaDto = {
+      totalItems: totalItems,
+      itemCount: items.length,
+      itemsPerPage: limit,
+
+      totalPages: totalPages,
+      currentPage: currentPage,
+    };
+
+    return new PaginationDto(items, meta);
   }
 
   protected async storeVoteResult(pollId: string, optionId: string, voterHash: string): Promise<Vote> {
