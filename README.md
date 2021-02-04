@@ -6,11 +6,12 @@ This repository is code release for the Simple Voting project. It provides a sim
 
 ## Features
 
-- [ ] Starting up a campaign with / without time constraint
-- [ ] Voting
+- [x] Starting up a campaign with time constraint
+- [x] Voting
 - [ ] Real-time vote count
-- [ ] Using hashing to protect voters' information
-- [ ] List all voting campaign, order by:
+- [ ] Display vote count after user vote for the poll
+- [x] Using hashing to protect voters' information
+- [x] List all voting campaign, order by:
   1. Active campaigns
   2. Most recent ended campaign
 - [ ] Housekeeping ended campaign voter data
