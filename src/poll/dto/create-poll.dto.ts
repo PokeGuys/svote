@@ -10,20 +10,10 @@ import {
   Min,
   Validate,
 } from 'class-validator';
-import { IsAfterDate } from 'src/app/rule/is-after-date';
-import { IsAfterOrToday } from 'src/app/rule/is-after-or-today';
-import { IsValidHKID } from 'src/app/rule/is-valid-hkid';
+import { IsAfterDate } from '../../app/rule/is-after-date';
+import { IsAfterOrToday } from '../../app/rule/is-after-or-today';
 
 export class CreatePollDto {
-  @IsNotEmpty()
-  @Validate(IsValidHKID)
-  @ApiProperty({
-    description: 'HKID number',
-    example: 'U5849818',
-    type: () => String,
-  })
-  readonly hkid: string;
-
   @IsNotEmpty()
   @MaxLength(100)
   @ApiProperty({

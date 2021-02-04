@@ -1,5 +1,5 @@
 import { ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
-import { isValid } from 'src/util/hkid.extractor';
+import { isValid } from '../../util/hkid.extractor';
 
 @ValidatorConstraint({ async: false })
 export class IsValidHKID implements ValidatorConstraintInterface {

@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, Validate } from 'class-validator';
+import { IsNotEmpty, IsString, Validate } from 'class-validator';
 import { IsValidHKID } from '../../app/rule/is-valid-hkid';
 
-export class VoteDto {
+export class AuthDto {
+  @IsString()
   @IsNotEmpty()
   @Validate(IsValidHKID)
   @ApiProperty({

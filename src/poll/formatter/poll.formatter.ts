@@ -1,4 +1,4 @@
-import { BaseFormatter } from 'src/app/base-formatter';
+import { BaseFormatter } from '../../app/base-formatter';
 import { PollResponseDto } from '../dto/response/poll-response.dto';
 import { Poll } from './../poll.entity';
 
