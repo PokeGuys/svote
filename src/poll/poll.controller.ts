@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -7,10 +8,11 @@ import {
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import * as dayjs from 'dayjs';
+import { UserId } from '../app/decorator/user-id.decorator';
+import { AuthGuard } from '../app/guards/auth.guard';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { PollsQueryDto } from './dto/polls-query.dto';
 import { PollListResponseDto } from './dto/response/poll-list-response.dto';
-import { VoteDto } from './dto/vote.dto';
 import { PollFormatter } from './formatter/poll.formatter';
 import { PollService } from './poll.service';
 
@@ -27,9 +29,11 @@ export class PollController {
   @ApiUnprocessableEntityResponse({
     description: 'Validation failed.',
   })
-  public async createPoll(@Body() createPollDto: CreatePollDto) {
-    const { hkid, title, options, startAt, endAt } = createPollDto;
-    const poll = await this.pollService.createPoll(hkid, title, options, startAt, endAt);
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  public async createPoll(@UserId() userId: string, @Body() createPollDto: CreatePollDto) {
+    const { title, options, startAt, endAt } = createPollDto;
+    const poll = await this.pollService.createPoll(userId, title, options, startAt, endAt);
     return this.pollFormatter.toJson(poll);
   }
 
@@ -57,7 +61,9 @@ export class PollController {
   @ApiUnprocessableEntityResponse({
     description: 'Validation failed.',
   })
-  public async voteCampaign(@Param('pollOptionId') pollOptionId: string, @Body() voteDto: VoteDto) {
-    await this.pollService.vote(pollOptionId, voteDto.hkid);
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  public async voteCampaign(@Param('pollOptionId') pollOptionId: string, @UserId() userId: string) {
+    await this.pollService.vote(pollOptionId, userId);
   }
 }
