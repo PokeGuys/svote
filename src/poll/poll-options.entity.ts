@@ -24,7 +24,7 @@ export class PollOption extends BaseEntity {
   @Type(() => Date)
   updatedAt: Date;
 
-  @ManyToOne(() => Poll, (poll) => poll.options, { eager: true })
+  @ManyToOne(() => Poll, (poll) => poll.options)
   @JoinColumn({ name: 'pollId', referencedColumnName: 'pollId' })
   poll: Poll;
 }

@@ -2,8 +2,8 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import dayjs from 'dayjs';
 import IORedis from 'ioredis';
-import { paginateRaw, Pagination } from 'nestjs-typeorm-paginate';
-import { Repository } from 'typeorm';
+import { paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { In, Repository } from 'typeorm';
 import { REDIS_CLIENT } from '../app/redis/redis.constant';
 import { PollAlreadyClosedException } from './exception/poll-already-closed.exception';
 import { PollAlreadyVotedException } from './exception/poll-already-voted.exception';
@@ -53,19 +53,29 @@ export class PollService {
   }
 
   public async getPolls(page: number): Promise<Pagination<Poll>> {
+    // TODO: Apply caching.
     // Filter-out scheduled poll.
     const builder = this.pollRepo
       .createQueryBuilder('poll')
-      .innerJoinAndSelect('poll.options', 'pollOption')
       .where('CURRENT_DATE >= poll.startAt')
       .orderBy(
         `poll.isActive DESC, CASE WHEN poll.isActive THEN poll.count END DESC, CASE WHEN NOT poll.isActive THEN poll.endAt END`,
         'DESC',
       );
-    return paginateRaw(builder, {
+    const { items, meta } = await paginate(builder, {
       page,
       limit: POLL_PAGE_LIMIT,
     });
+    const pollKeyById = items.reduce((acc, item) => ({ ...acc, [item.pollId]: item }), {} as any);
+    const pollIds = items.map((item) => item.pollId);
+    const options = await this.getOptionsByIds(pollIds);
+    options.forEach((option) => {
+      if (pollKeyById[option.pollId].options === undefined) {
+        pollKeyById[option.pollId].options = [];
+      }
+      pollKeyById[option.pollId].options.push(option);
+    });
+    return new Pagination(items, meta);
   }
 
   public async vote(optionId: string, hkid: string): Promise<void> {
@@ -85,10 +95,19 @@ export class PollService {
     await this.pollOptionRepo.increment({ optionId }, 'count', 1);
   }
 
-  protected async findOption(optionId: string): Promise<PollOption> {
-    const option = await this.pollOptionRepo.findOne({
-      optionId,
+  protected async getOptionsByIds(pollIds: string[]): Promise<PollOption[]> {
+    return this.pollOptionRepo.find({
+      pollId: In(pollIds),
     });
+  }
+
+  protected async findOption(optionId: string): Promise<PollOption> {
+    const option = await this.pollOptionRepo.findOne(
+      {
+        optionId,
+      },
+      { relations: ['poll'] },
+    );
     if (option === undefined) {
       throw new PollNotFoundException();
     }

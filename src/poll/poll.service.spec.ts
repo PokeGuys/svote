@@ -19,6 +19,7 @@ const testPollOptions = ['Michael Jordan', 'Kobe Bryant'];
 describe('PollService', () => {
   const onePoll = new Poll();
   let onePollOption: PollOption;
+  let pollOptionArray: PollOption[];
   let pollArray: Poll[];
   let service: PollService;
   let pollRepo: Repository<Poll>;
@@ -39,7 +40,10 @@ describe('PollService', () => {
               where: jest.fn().mockReturnThis(),
               limit: jest.fn().mockReturnThis(),
               offset: jest.fn().mockReturnThis(),
+              take: jest.fn().mockReturnThis(),
+              skip: jest.fn().mockReturnThis(),
               clone: jest.fn().mockReturnThis(),
+              getManyAndCount: jest.fn().mockReturnValue([pollArray, 1]),
               getRawMany: jest.fn().mockReturnValue(pollArray),
               getCount: jest.fn().mockReturnValue(1),
             })),
@@ -51,6 +55,7 @@ describe('PollService', () => {
             save: jest.fn(),
             increment: jest.fn(),
             findOne: jest.fn().mockReturnValue(onePollOption),
+            find: jest.fn().mockReturnValue(pollOptionArray),
           },
         },
         {
@@ -84,6 +89,7 @@ describe('PollService', () => {
     });
     onePollOption = onePoll.options[0];
 
+    pollOptionArray = onePoll.options;
     pollArray = [onePoll];
   });
 
@@ -125,15 +131,15 @@ describe('PollService', () => {
     it('should vote the poll', async () => {
       const pollOptionSpy = jest.spyOn(pollOptionRepo, 'findOne');
       await service.vote('a uuid', userId);
-      expect(pollOptionSpy).toBeCalledWith({ optionId: 'a uuid' });
+      expect(pollOptionSpy).toBeCalledWith({ optionId: 'a uuid' }, { relations: ['poll'] });
       expect(pollOptionSpy).toBeCalledTimes(1);
       expect(pollOptionRepo.increment).toBeCalledTimes(1);
     });
 
     it('should throw not found exception', async () => {
-      const pollOptionSpy = jest.spyOn(pollOptionRepo, 'findOne').mockReturnValue(undefined);
+      const pollOptionSpy = jest.spyOn(pollOptionRepo, 'findOne').mockImplementation(() => Promise.resolve(undefined));
       expect(service.vote('a bad uuid', userId)).rejects.toThrowError(new PollNotFoundException());
-      expect(pollOptionSpy).toBeCalledWith({ optionId: 'a bad uuid' });
+      expect(pollOptionSpy).toBeCalledWith({ optionId: 'a bad uuid' }, { relations: ['poll'] });
       expect(pollOptionSpy).toBeCalledTimes(1);
     });
 
@@ -143,7 +149,7 @@ describe('PollService', () => {
         return onePollOption;
       });
       expect(service.vote('a bad uuid', userId)).rejects.toThrowError(new PollNotFoundException());
-      expect(pollOptionSpy).toBeCalledWith({ optionId: 'a bad uuid' });
+      expect(pollOptionSpy).toBeCalledWith({ optionId: 'a bad uuid' }, { relations: ['poll'] });
       expect(pollOptionSpy).toBeCalledTimes(1);
     });
 
@@ -153,7 +159,7 @@ describe('PollService', () => {
         return onePollOption;
       });
       expect(service.vote('a bad uuid', userId)).rejects.toThrowError(new PollAlreadyClosedException());
-      expect(pollOptionSpy).toBeCalledWith({ optionId: 'a bad uuid' });
+      expect(pollOptionSpy).toBeCalledWith({ optionId: 'a bad uuid' }, { relations: ['poll'] });
       expect(pollOptionSpy).toBeCalledTimes(1);
     });
 
