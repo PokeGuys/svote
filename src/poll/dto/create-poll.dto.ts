@@ -19,7 +19,7 @@ export class CreatePollDto {
   @ApiProperty({
     description: 'Poll title',
     example: 'Who is the best NBA player in history',
-    type: () => String,
+    type: 'string',
   })
   readonly title: string;
 
@@ -30,7 +30,7 @@ export class CreatePollDto {
   @ApiProperty({
     description: 'Poll start date',
     example: 1613253120,
-    type: () => Number,
+    type: 'number',
   })
   readonly startAt: number;
 
@@ -41,7 +41,7 @@ export class CreatePollDto {
   @ApiProperty({
     description: 'Poll end date',
     example: 1614253120,
-    type: () => Number,
+    type: 'number',
   })
   readonly endAt: number;
 
@@ -54,7 +54,7 @@ export class CreatePollDto {
   @ApiProperty({
     description: 'Poll options',
     example: ['Michael Jordan', 'Kobe Bryant', 'Leborn James', 'Stephen Curry'],
-    type: () => 'array',
+    type: 'array',
     minItems: 2,
     maxItems: 20,
     items: {

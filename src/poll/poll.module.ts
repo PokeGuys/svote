@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RedisModule } from '../app/redis/redis.module';
-import { ConfigFactoryModule } from '../config/config-factory.module';
 import { RedisConfigService } from '../config/redis-config.service';
 import { PollFormatter } from './formatter/poll.formatter';
 import { PollOption } from './poll-options.entity';
@@ -13,7 +12,6 @@ import { Vote } from './vote.entity';
 
 @Module({
   imports: [
-    ConfigFactoryModule,
     TypeOrmModule.forFeature([Vote, Poll, PollOption]),
     RedisModule.registerAsync({
       useExisting: RedisConfigService,

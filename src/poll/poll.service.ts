@@ -30,13 +30,16 @@ export class PollService {
     startAt: number,
     endAt: number,
   ): Promise<Poll> {
+    const today = dayjs().startOf('day');
     const startDate = dayjs.unix(startAt).startOf('day');
+    const endDate = dayjs.unix(endAt).startOf('day');
     const poll = new Poll();
     poll.title = title;
     poll.creatorId = hkid;
-    poll.isActive = startDate.isSame(dayjs().startOf('day'));
+    poll.isActive = startDate.diff(today) <= 0 && endDate.diff(today) > 0;
+    poll.isEnded = false;
     poll.startAt = startDate.toDate();
-    poll.endAt = dayjs.unix(endAt).toDate();
+    poll.endAt = endDate.toDate();
     await this.pollRepo.save(poll);
     poll.options = options.map((optionDescription) => {
       const option = new PollOption();
@@ -68,6 +71,9 @@ export class PollService {
   public async vote(optionId: string, hkid: string): Promise<void> {
     const option = await this.findOption(optionId);
     if (!option.poll.isActive) {
+      throw new PollNotFoundException();
+    }
+    if (option.poll.isEnded) {
       throw new PollAlreadyClosedException();
     }
     const cacheKey = this.newVoteCacheKey(option.pollId);
