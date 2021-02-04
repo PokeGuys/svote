@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import IORedis from 'ioredis';
 import { paginateRaw, Pagination } from 'nestjs-typeorm-paginate';
 import { Repository } from 'typeorm';

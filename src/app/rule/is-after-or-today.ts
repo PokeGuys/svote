@@ -1,5 +1,5 @@
 import { ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
 @ValidatorConstraint({ async: false })
 export class IsAfterOrToday implements ValidatorConstraintInterface {

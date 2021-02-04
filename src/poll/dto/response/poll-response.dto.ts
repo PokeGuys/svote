@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { Poll } from '../../poll.entity';
 import { PollOptionResponseDto } from './poll-option-response.dto';
 

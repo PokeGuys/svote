@@ -1,5 +1,5 @@
 import { Provider } from '@nestjs/common';
-import * as Redis from 'ioredis';
+import Redis from 'ioredis';
 import { REDIS_CLIENT, REDIS_OPTIONS } from './redis.constant';
 import { RedisModuleOptions } from './redis.interface';
 

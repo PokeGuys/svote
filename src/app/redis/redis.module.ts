@@ -48,7 +48,7 @@ export class RedisModule {
     return {
       provide: REDIS_OPTIONS,
       useFactory: async (optionsFactory: RedisOptionsFactory) => optionsFactory.createRedisOptions(),
-      inject: [options.useExisting || options.useClass],
+      inject: [(options.useExisting as Type<RedisOptionsFactory>) || (options.useClass as Type<RedisOptionsFactory>)],
     };
   }
 }
