@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
-import { BaseEntity, Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { PollOption } from './poll-options.entity';
+import { Vote } from './vote.entity';
 
 @Entity('polls')
 export class Poll extends BaseEntity {
@@ -41,4 +42,8 @@ export class Poll extends BaseEntity {
   @OneToMany(() => PollOption, (option) => option.poll)
   @JoinColumn({ name: 'pollId', referencedColumnName: 'pollId' })
   options: PollOption[];
+
+  @OneToOne(() => Vote, (vote) => vote.poll)
+  @JoinColumn({ name: 'pollId', referencedColumnName: 'pollId' })
+  vote?: Vote | null;
 }

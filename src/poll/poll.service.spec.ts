@@ -10,6 +10,7 @@ import { PollNotFoundException } from './exception/poll-not-found.exception';
 import { PollOption } from './poll-options.entity';
 import { Poll } from './poll.entity';
 import { PollService } from './poll.service';
+import { Vote } from './vote.entity';
 
 const userId = 'fake-user-id';
 const testPollTitle = 'Who is the best NBA player in history';
@@ -35,6 +36,7 @@ describe('PollService', () => {
           useValue: {
             save: jest.fn(),
             createQueryBuilder: jest.fn(() => ({
+              leftJoinAndMapOne: jest.fn().mockReturnThis(),
               innerJoinAndSelect: jest.fn().mockReturnThis(),
               orderBy: jest.fn().mockReturnThis(),
               where: jest.fn().mockReturnThis(),
@@ -43,6 +45,7 @@ describe('PollService', () => {
               take: jest.fn().mockReturnThis(),
               skip: jest.fn().mockReturnThis(),
               clone: jest.fn().mockReturnThis(),
+              getRawAndEntities: jest.fn().mockReturnValue({ raw: [], entities: pollArray }),
               getManyAndCount: jest.fn().mockReturnValue([pollArray, 1]),
               getRawMany: jest.fn().mockReturnValue(pollArray),
               getCount: jest.fn().mockReturnValue(1),
@@ -56,6 +59,12 @@ describe('PollService', () => {
             increment: jest.fn(),
             findOne: jest.fn().mockReturnValue(onePollOption),
             find: jest.fn().mockReturnValue(pollOptionArray),
+          },
+        },
+        {
+          provide: getRepositoryToken(Vote),
+          useValue: {
+            save: jest.fn(),
           },
         },
         {
@@ -121,7 +130,7 @@ describe('PollService', () => {
     it('should get an array of polls', async () => {
       const pollRepoSpy = jest.spyOn(pollRepo, 'createQueryBuilder');
 
-      const result = await service.getPolls(1);
+      const result = await service.getPolls(1, userId);
       expect(pollRepoSpy).toBeCalledTimes(1);
       expect(result.items).toEqual(pollArray);
     });

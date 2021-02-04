@@ -24,6 +24,6 @@ export class PollResponseDto {
     this.title = poll.title;
     this.startAt = dayjs(poll.startAt).unix();
     this.endAt = dayjs(poll.endAt).unix();
-    this.options = poll.options.map((option) => new PollOptionResponseDto(option, poll.isEnded));
+    this.options = poll.options.map((option) => new PollOptionResponseDto(poll, option));
   }
 }

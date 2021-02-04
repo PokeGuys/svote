@@ -16,7 +16,9 @@ import { PollFormatter } from './formatter/poll.formatter';
 import { PollService } from './poll.service';
 
 @ApiTags('poll')
+@ApiBearerAuth()
 @Controller('polls')
+@UseGuards(AuthGuard)
 export class PollController {
   constructor(private readonly pollService: PollService, private readonly pollFormatter: PollFormatter) {}
 
@@ -28,8 +30,6 @@ export class PollController {
   @ApiUnprocessableEntityResponse({
     description: 'Validation failed.',
   })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   public async createPoll(@UserId() userId: string, @Body() createPollDto: CreatePollDto) {
     const { title, options, startAt, endAt } = createPollDto;
     const poll = await this.pollService.createPoll(userId, title, options, startAt, endAt);
@@ -42,8 +42,8 @@ export class PollController {
     description: 'Return all active polls.',
     type: PollListResponseDto,
   })
-  public async getPolls(@Query() query: PollsQueryDto) {
-    const polls = await this.pollService.getPolls(query.page ?? 1);
+  public async getPolls(@UserId() userId: string, @Query() query: PollsQueryDto) {
+    const polls = await this.pollService.getPolls(query.page ?? 1, userId);
     const items = polls.items.map(this.pollFormatter.toJson);
     return {
       items,
@@ -59,8 +59,6 @@ export class PollController {
   @ApiUnprocessableEntityResponse({
     description: 'Validation failed.',
   })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   public async voteCampaign(@Param('pollOptionId') pollOptionId: string, @UserId() userId: string) {
     await this.pollService.vote(pollOptionId, userId);
   }

@@ -105,7 +105,7 @@ describe('PollController', () => {
     });
 
     it('should get an array of polls', async () => {
-      const polls = await pollController.getPolls({ page: 1 });
+      const polls = await pollController.getPolls(userId, { page: 1 });
       expect(polls.items[0]).toEqual({
         id: testPollId,
         title: testPollTitle,
