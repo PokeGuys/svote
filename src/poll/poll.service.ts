@@ -54,7 +54,12 @@ export class PollService {
     if (cursor !== undefined) {
       builder.andWhere('poll.createdAt < :cursor', { cursor: dayjs.unix(cursor).toDate() });
     }
-    return builder.orderBy('poll.isActive', 'DESC').addOrderBy('poll.count', 'DESC').getMany();
+    return builder
+      .orderBy(
+        `poll.isActive DESC, CASE WHEN poll.isActive THEN poll.count END DESC, CASE WHEN NOT poll.isActive THEN poll.endAt END`,
+        'DESC',
+      )
+      .getMany();
   }
 
   public async vote(optionId: string, hkid: string): Promise<void> {
