@@ -19,6 +19,9 @@ export class Poll extends BaseEntity {
   @Column('boolean')
   isActive: boolean;
 
+  @Column('boolean')
+  isEnded: boolean;
+
   @Column('date')
   @Type(() => Date)
   startAt: Date;
