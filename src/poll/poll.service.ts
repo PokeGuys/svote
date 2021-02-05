@@ -166,17 +166,12 @@ export class PollService {
   }
 
   protected async findOption(optionId: string): Promise<PollOption> {
-    const option = await this.pollOptionRepo
-      .findOne(
-        {
-          optionId,
-        },
-        { relations: ['poll'] },
-      )
-      .catch((err) => {
-        console.error('findOption:', err);
-        throw new PollNotFoundException();
-      });
+    const option = await this.pollOptionRepo.findOne(
+      {
+        optionId,
+      },
+      { relations: ['poll'] },
+    );
     if (option === undefined) {
       throw new PollNotFoundException();
     }

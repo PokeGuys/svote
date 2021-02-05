@@ -72,6 +72,12 @@ describe('PollService', () => {
           useValue: {
             sismember: jest.fn().mockReturnValue(0),
             sadd: jest.fn(),
+            pipeline: jest.fn(() => ({
+              sadd: jest.fn().mockReturnThis(),
+              expire: jest.fn().mockReturnThis(),
+              exec: jest.fn(),
+            })),
+            ttl: jest.fn().mockReturnValue(0),
           },
         },
       ],

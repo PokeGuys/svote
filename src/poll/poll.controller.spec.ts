@@ -33,6 +33,8 @@ describe('PollController', () => {
                     pollId: testPollId,
                     creatorId: userId,
                     title: testPollTitle,
+                    isActive: false,
+                    isEnded: false,
                     startAt: dayjs.unix(testPollStartRange[0]).toDate(),
                     endAt: dayjs.unix(testPollStartRange[1]).toDate(),
                     options: testPollOptions.map((text, idx) => ({
@@ -45,6 +47,8 @@ describe('PollController', () => {
                     pollId: 'test poll 2',
                     creatorId: 'test user id',
                     title: 'testing poll',
+                    isActive: false,
+                    isEnded: false,
                     startAt: dayjs.unix(testPollStartRange[0]).toDate(),
                     endAt: dayjs.unix(testPollStartRange[1]).toDate(),
                     options: ['test op1', 'test op2'].map((text, idx) => ({
@@ -103,7 +107,9 @@ describe('PollController', () => {
         expect(createPollResult.options[i].text).toBe(testPollOptions[i]);
       }
     });
+  });
 
+  describe('getPolls', () => {
     it('should get an array of polls', async () => {
       const polls = await pollController.getPolls(userId, { page: 1 });
       expect(polls.items[0]).toEqual({
@@ -111,6 +117,9 @@ describe('PollController', () => {
         title: testPollTitle,
         startAt: testPollStartRange[0],
         endAt: testPollStartRange[1],
+        isActive: false,
+        isEnded: false,
+        voted: false,
         options: testPollOptions.map((text, idx) => ({
           count: 0,
           optionId: idx,

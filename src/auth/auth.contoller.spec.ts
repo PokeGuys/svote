@@ -19,6 +19,7 @@ describe('AuthController', () => {
           provide: AuthService,
           useValue: {
             createToken: jest.fn().mockReturnValue(testToken),
+            createRefreshToken: jest.fn().mockReturnValue(testToken),
           },
         },
       ],
