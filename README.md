@@ -14,7 +14,7 @@ This repository is code release for the Simple Voting project. It provides a sim
 - [x] List all voting campaign, order by:
   1. Active campaigns
   2. Most recent ended campaign
-- [ ] Housekeeping ended campaign voter data
+- [x] Housekeeping ended campaign voter data
 
 ## Setup
 

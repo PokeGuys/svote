@@ -10,6 +10,7 @@ import { PollAlreadyClosedException } from './exception/poll-already-closed.exce
 import { PollAlreadyVotedException } from './exception/poll-already-voted.exception';
 import { PollNotFoundException } from './exception/poll-not-found.exception';
 import { PollOption } from './poll-options.entity';
+import { PollCacheBuilder } from './poll.cache';
 import { POLL_PAGE_LIMIT } from './poll.constant';
 import { Poll } from './poll.entity';
 import { Vote } from './vote.entity';
@@ -113,12 +114,19 @@ export class PollService {
     if (option.poll.isEnded) {
       throw new PollAlreadyClosedException();
     }
-    const cacheKey = this.newVoteCacheKey(option.pollId);
+    const queueKey = PollCacheBuilder.updatePollVoteQueueCacheKey();
+    const cacheKey = PollCacheBuilder.newVoteCacheKey(option.pollId);
+    const ttl = await this.cache.ttl(cacheKey);
     const isVoted = await this.cache.sismember(cacheKey, hkid);
     if (isVoted) {
       throw new PollAlreadyVotedException();
     }
-    await this.cache.sadd(cacheKey, hkid);
+    const pipeline = this.cache.pipeline().sadd(cacheKey, hkid).sadd(queueKey, option.pollId);
+    if (ttl === -1) {
+      const expiryInSec = dayjs(option.poll.endAt).add(1, 'month').diff(dayjs(), 'seconds');
+      pipeline.expire(cacheKey, expiryInSec);
+    }
+    await pipeline.exec();
     await this.pollOptionRepo.increment({ optionId }, 'count', 1);
     return this.storeVoteResult(option.pollId, optionId, hkid);
   }
@@ -173,9 +181,5 @@ export class PollService {
       throw new PollNotFoundException();
     }
     return option;
-  }
-
-  private newVoteCacheKey(pollId: string): string {
-    return `nestjs:svote:poll:${pollId}:votes`;
   }
 }

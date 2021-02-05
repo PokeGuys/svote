@@ -72,6 +72,8 @@ export class PollController {
     description: 'Validation failed.',
   })
   public async voteCampaign(@Param('pollOptionId') pollOptionId: string, @UserId() userId: string) {
-    await this.pollService.vote(pollOptionId, userId);
+    const voteResult = await this.pollService.vote(pollOptionId, userId);
+    const poll = await this.pollService.getPoll(voteResult.pollId, userId);
+    return this.pollFormatter.toJson(poll);
   }
 }
