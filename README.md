@@ -16,20 +16,9 @@ This repository is code release for the Simple Voting project. It provides a sim
   2. Most recent ended campaign
 - [x] Housekeeping ended campaign voter data
 
-## Setup
-
-### Software Stack
-
-SVote is a Nest.js, fastify based, application that run on the following software:
-
-- Alpine Linux 3.11
-- PostgreSQL 13.1
-- Redis 6.0
-- Node.js 14.15.4
+## Quick Start
 
 To install all the required stack on a server, we used Docker to build the application image.
-
-### Installation
 
 ```bash
 # 1. Clone the repository
@@ -46,3 +35,18 @@ cp .env.example .env
 # 5. Run Svote via Docker
 docker-compose up
 ```
+
+## Documentation
+
+This project includes a `docs` folder with more details on:
+
+1. [Setup and development](./docs/development.md)
+2. [Architecture and design decision](./docs/architecture.md)
+
+## Fontend Demo
+
+SVote-vue (<https://github.com/pokeguys/svote-vue>)
+
+## API Documentation
+
+Swagger (<http://localhost:3000/docs/api>)
