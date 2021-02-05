@@ -3,7 +3,9 @@ import { PaginationMetaDto } from '../../../app/pagination-meta.dto';
 import { PollResponseDto } from './poll-response.dto';
 
 export class PollListResponseDto {
-  @ApiProperty()
+  @ApiProperty({
+    type: [PollResponseDto],
+  })
   items: PollResponseDto[];
 
   @ApiProperty()

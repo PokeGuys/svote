@@ -40,7 +40,7 @@ export class PollController {
   @ApiOperation({ summary: 'Get active poll list' })
   @ApiOkResponse({
     description: 'Return all active polls.',
-    type: PollListResponseDto,
+    type: () => PollListResponseDto,
   })
   public async getPolls(@UserId() userId: string, @Query() query: PollsQueryDto) {
     const polls = await this.pollService.getPolls(query.page ?? 1, userId);

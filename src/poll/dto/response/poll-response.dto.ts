@@ -16,7 +16,9 @@ export class PollResponseDto {
   @ApiProperty()
   endAt: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: [PollOptionResponseDto],
+  })
   options: PollOptionResponseDto[];
 
   constructor(poll: Poll) {
