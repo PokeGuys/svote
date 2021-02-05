@@ -12,6 +12,7 @@ import { AuthGuard } from '../app/guards/auth.guard';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { PollsQueryDto } from './dto/polls-query.dto';
 import { PollListResponseDto } from './dto/response/poll-list-response.dto';
+import { PollResponseDto } from './dto/response/poll-response.dto';
 import { PollFormatter } from './formatter/poll.formatter';
 import { PollService } from './poll.service';
 
@@ -49,6 +50,17 @@ export class PollController {
       items,
       meta: polls.meta,
     };
+  }
+
+  @Get(':pollId')
+  @ApiOperation({ summary: 'Get poll detail' })
+  @ApiOkResponse({
+    description: 'Return an active polls.',
+    type: () => PollResponseDto,
+  })
+  public async getPoll(@UserId() userId: string, @Param('pollId') pollId: string) {
+    const poll = await this.pollService.getPoll(pollId, userId);
+    return this.pollFormatter.toJson(poll);
   }
 
   @Post(':pollOptionId/vote')

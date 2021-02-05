@@ -90,6 +90,21 @@ export class PollService {
     return this.createPaginationObject(items, total, page, limit);
   }
 
+  public async getPoll(pollId: string, userId: string): Promise<Poll> {
+    const poll = await this.pollRepo
+      .createQueryBuilder('poll')
+      .where('poll.pollId = :pollId', { pollId })
+      .innerJoinAndMapMany('poll.options', PollOption, 'options', 'poll.pollId = options.pollId')
+      .leftJoinAndMapOne('poll.vote', Vote, 'vote', 'poll.pollId = vote.pollId AND vote.voterHash = :userId', {
+        userId,
+      })
+      .getOne();
+    if (poll === undefined) {
+      throw new PollNotFoundException();
+    }
+    return poll;
+  }
+
   public async vote(optionId: string, hkid: string): Promise<Vote> {
     const option = await this.findOption(optionId);
     if (!option.poll.isActive) {
@@ -143,12 +158,17 @@ export class PollService {
   }
 
   protected async findOption(optionId: string): Promise<PollOption> {
-    const option = await this.pollOptionRepo.findOne(
-      {
-        optionId,
-      },
-      { relations: ['poll'] },
-    );
+    const option = await this.pollOptionRepo
+      .findOne(
+        {
+          optionId,
+        },
+        { relations: ['poll'] },
+      )
+      .catch((err) => {
+        console.error('findOption:', err);
+        throw new PollNotFoundException();
+      });
     if (option === undefined) {
       throw new PollNotFoundException();
     }
