@@ -6,8 +6,11 @@ import { ValidationPipe } from './app/pipe/validation.pipe';
 import { setupSwagger } from './swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(ApplicationModule, new FastifyAdapter(), { cors: true });
+  const app = await NestFactory.create<NestFastifyApplication>(ApplicationModule, new FastifyAdapter());
   app.setGlobalPrefix('api');
+
+  // Enable CORS
+  app.enableCors();
 
   // Setup SwaggerModule
   setupSwagger(app);
